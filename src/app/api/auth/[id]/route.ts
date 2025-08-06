@@ -2,6 +2,8 @@ import client from "@/lib/prisma";
 import { clerkClient } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   req: NextRequest,
   { params: { id } }: { params: { id: string } }
@@ -86,5 +88,9 @@ export async function GET(
     return NextResponse.json({ status: 400 });
   } catch (error) {
     console.log("Error while get user profile ", error);
+    return NextResponse.json(
+      { message: "An internal server error occurred." },
+      { status: 500 }
+    );
   }
 }
