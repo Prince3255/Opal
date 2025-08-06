@@ -1,18 +1,26 @@
 'use client'
 
 import { getNotifications } from '@/app/action/workspace'
+import Spinner from '@/components/global/loader/spinner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useQueryData } from '@/hooks/useQueryData'
 import { User } from 'lucide-react'
 import React from 'react'
 
+
 type Props = {}
 
 const Notification = (props: Props) => {
-    const { data: notifications } = useQueryData(
+    const { data: notifications, isFetching } = useQueryData(
         ['user-notification'],
         getNotifications
     )
+
+    if (isFetching) {
+        return (
+            <Spinner />
+        )
+    }
 
     const { data: notification, status} = notifications as {
         status: number,
