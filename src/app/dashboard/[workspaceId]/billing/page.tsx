@@ -1,6 +1,8 @@
 import { getPaymentInfo } from "@/app/action/workspace";
 import React from "react";
 
+export const dynamic = 'force-dynamic'
+
 type Props = {};
 
 const BillingPage = async (props: Props) => {
