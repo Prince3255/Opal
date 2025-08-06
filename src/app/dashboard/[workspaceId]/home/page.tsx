@@ -4,6 +4,8 @@ import VideoCard from "@/components/global/video/video-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
 
+export const dynamic = 'force-dynamic'
+
 type Props = {};
 
 const Home = async (props: Props) => {
