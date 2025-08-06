@@ -6,6 +6,8 @@ import Folder from "@/components/global/folder"
 import VideoCard from "@/components/global/video-folder"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+export const dynamic = 'force-dynamic';
+
 type Props = {
   params: { workspaceId: string }
 }
