@@ -11,6 +11,8 @@ import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+export const dynamic = 'force-dynamic';
+
 type Props = {};
 
 const SettingPage = (props: Props) => {
