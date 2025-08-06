@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 
 type Props = {}
 
+export const dynamic = 'force-dynamic'
+
 const Dashboard = async (props: Props) => {
 
     const auth = await onAuthenticateUser()

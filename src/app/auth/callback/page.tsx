@@ -1,6 +1,8 @@
 import { onAuthenticateUser } from '@/app/action/user' 
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 type Props = {}
 
 const AuthCallbackPage = async (props: Props) => {
