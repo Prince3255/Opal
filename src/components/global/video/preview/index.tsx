@@ -47,12 +47,18 @@ const VideoPreview = ({ videoId }: Props) => {
 
   const { status, author, data: video } = data as VideoProps;
 
-  const daysAgo = Math.floor(
-    (new Date().getTime() - video?.createdAt.getTime()) / (24 * 60 * 60 * 1000)
-  );
+  // Fix: video may be an array, so use the first element if so
+  const videoItem = Array.isArray(video) ? video[0] : video;
+
+  const daysAgo = videoItem?.createdAt
+    ? Math.floor(
+        (new Date().getTime() - new Date(videoItem.createdAt).getTime()) /
+          (24 * 60 * 60 * 1000)
+      )
+    : 0;
 
   useEffect(() => {
-    if (video?.views === 0) {
+    if (videoItem?.views === 0) {
       notifyFisrtView();
     }
 
@@ -91,9 +97,9 @@ const VideoPreview = ({ videoId }: Props) => {
     let value = e.target.value;
     if (value) {
       if (type === "title") {
-        mutate({ title: value, description: video?.description });
+        mutate({ title: value, description: videoItem?.description ?? "" });
       } else if (type === "description") {
-        mutate({ title: video?.title, description: value });
+        mutate({ title: videoItem?.title ?? "", description: value });
       } else {
         console.error("Edit type not defined");
       }
@@ -115,7 +121,7 @@ const VideoPreview = ({ videoId }: Props) => {
                   updateVideoDetail(e, "title");
                 }}
                 autoFocus
-                defaultValue={video?.title}
+                defaultValue={videoItem?.title ?? ""}
               />
             ) : (
               <h2
@@ -126,8 +132,8 @@ const VideoPreview = ({ videoId }: Props) => {
                 {isPending && onRenameT
                   ? latestVariables && latestVariables?.status === "pending"
                     ? latestVariables?.variables?.title
-                    : video?.title
-                  : video?.title}
+                    : videoItem?.title
+                  : videoItem?.title}
               </h2>
             )}
             {/* {author ? (
@@ -142,7 +148,7 @@ const VideoPreview = ({ videoId }: Props) => {
           </div>
           <span className="flex gap-x-3 mt-2">
             <p className="text-[#9D9D9D] capitalize">
-              {video?.User?.firstname} {video?.User?.lastname}
+              {videoItem?.User?.firstname} {videoItem?.User?.lastname}
             </p>
             <p className="text-[#707070]">
               {daysAgo === 0 ? "Today" : `${daysAgo}d ago`}
@@ -157,7 +163,7 @@ const VideoPreview = ({ videoId }: Props) => {
           {/* <source
             src={`${process.env.NEXT_PUBLIC_CLOUD_FRONT_STREAM_URL}/${video?.source}#1`}
           /> */}
-          <source src={`${video?.source}`} />
+          <source src={`${videoItem?.source}`} />
         </video>
         <div className="flex flex-col text-2xl gap-y-4">
           <div className="flex gap-x-5 items-center justify-between">
@@ -178,7 +184,7 @@ const VideoPreview = ({ videoId }: Props) => {
                 updateVideoDetail(e, "description");
               }}
               autoFocus
-              defaultValue={video?.description}
+              defaultValue={videoItem?.description ?? ""}
             />
           ) : (
             <p
@@ -189,8 +195,8 @@ const VideoPreview = ({ videoId }: Props) => {
               {isPending && onRenameD
                 ? latestVariables && latestVariables?.status === "pending"
                   ? latestVariables?.variables?.description
-                  : video?.description
-                : video?.description}
+                  : videoItem?.description
+                : videoItem?.description}
             </p>
           )}
         </div>
@@ -203,9 +209,9 @@ const VideoPreview = ({ videoId }: Props) => {
             videoId={videoId}
           />
           <RichLink
-            title={video?.title as string}
-            description={truncateString(video?.description as string, 150)}
-            source={video?.source}
+            title={videoItem?.title as string}
+            description={truncateString(videoItem?.description as string, 150)}
+            source={videoItem?.source}
             id={videoId}
           />
           <Download className="text-[#4d4c4c]" />
@@ -218,17 +224,17 @@ const VideoPreview = ({ videoId }: Props) => {
             triggers={["Ai Tools", "Transcript", "Activity"]}
           >
             <AiTools
-              plan={video?.User?.subscription?.plan}
-              trial={video?.User?.trial!}
+              plan={videoItem?.User?.subscription?.plan ?? "FREE"}
+              trial={videoItem?.User?.trial!}
               videoId={videoId}
-              videoUrl={video?.source}
-              clerkId={video?.User?.id}
+              videoUrl={videoItem?.source}
+              clerkId={videoItem?.User?.id || ""}
               goToTranscript={() => setActiveTab("Transcript")}
             />
-            <VideoTranscript transcript={video?.summery} />
+            <VideoTranscript transcript={videoItem?.summery ?? ""} />
             <div className="overflow-y-scroll max-h-[80vh] scrollbar-thin">
               <Activities
-                author={video?.User?.firstname as string}
+                author={videoItem?.User?.firstname as string}
                 videoId={videoId}
               />
             </div>
