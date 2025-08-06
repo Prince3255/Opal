@@ -2,6 +2,8 @@ import { acceptInvite } from "@/app/action/user";
 import { redirect } from "next/navigation";
 import React from "react";
 
+export const dynamic = 'force-dynamic';
+
 type Props = {
   params: {
     inviteId: string;
