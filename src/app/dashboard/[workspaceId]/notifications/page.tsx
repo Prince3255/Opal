@@ -1,12 +1,12 @@
 'use client'
 
 import { getNotifications } from '@/app/action/workspace'
-import Spinner from '@/components/global/loader/spinner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useQueryData } from '@/hooks/useQueryData'
 import { User } from 'lucide-react'
 import React from 'react'
 
+export const dynamic = 'force-dynamic';
 
 type Props = {}
 
@@ -15,12 +15,6 @@ const Notification = (props: Props) => {
         ['user-notification'],
         getNotifications
     )
-
-    if (isFetching) {
-        return (
-            <Spinner />
-        )
-    }
 
     const { data: notification, status} = notifications as {
         status: number,
