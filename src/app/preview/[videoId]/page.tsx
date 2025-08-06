@@ -4,6 +4,8 @@ import VideoPreview from "@/components/global/video/preview";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import React from "react";
 
+export const dynamic = 'force-dynamic'
+
 type Props = {
   params: {
     videoId: string;
