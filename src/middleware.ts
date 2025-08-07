@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { NextRequest } from 'next/server';
 
-const allowedOrigin = ['http://localhost:5173', 'http://localhost:3000']
+const allowedOrigin = ['http://localhost:5173', 'https://opal-three.vercel']
 
 const corsOption = {
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
