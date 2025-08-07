@@ -94,7 +94,7 @@ const InfoBar = (props: Props) => {
         formData.append("clerkId", user?.clerkid);
         formData.append("plan", user?.subscription?.plan);
         formData.append("workspaceId", user?.workspace[0]?.id);
-        let res = await fetch("http://localhost:5000/api/upload", {
+        let res = await fetch("https://opal-express-08so.onrender.com/api/upload", {
           method: "POST",
           body: formData,
         });

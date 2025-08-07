@@ -36,7 +36,7 @@ const AiTools = ({
   
   const handleAiTool = async () => {
     if (plan === "PRO") {
-      let url = "http://localhost:5000/api/audio";
+      let url = "https://opal-express-08so.onrender.com/api/audio";
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -51,7 +51,7 @@ const AiTools = ({
       }
     }
     else if (!trial) {
-      let url = "http://localhost:5000/api/audio";
+      let url = "https://opal-express-08so.onrender.com/api/audio";
       console.log("acbd");
       const response = await fetch(url, {
         method: "POST",
