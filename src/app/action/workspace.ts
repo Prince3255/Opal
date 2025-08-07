@@ -709,11 +709,12 @@ export const moveVideoLocation = async (
             const updateResponse = await axios.patch(
               `https://api.voiceflow.com/v1/knowledge-base/docs/${video.documentId}/chunk/${targetChunk.chunkID}`,
               {
-                data: {
+                // data: {
                   metadata: {
                     transcript: transcript,
+                    workspaceId: workspaceId,
                   },
-                },
+                // },
               },
               {
                 headers: {
