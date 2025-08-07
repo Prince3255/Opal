@@ -190,6 +190,16 @@ export const inviteMembers = async (
           },
         });
 
+        const recieverInfo = await client.user.findUnique({
+          where: {
+            id: recieverId,
+          },
+          select: {
+            firstname: true,
+            lastname: true,
+          }
+        })
+
         await client.user.update({
           where: {
             clerkid: user.id,
@@ -197,7 +207,7 @@ export const inviteMembers = async (
           data: {
             notification: {
               create: {
-                content: `${user.firstName} ${user.lastName} invited ${senderInfo.firstname} into ${workspace.name}`,
+                content: `${user.firstName} ${user?.lastName || ''} invited ${recieverInfo?.firstname} ${recieverInfo?.lastname || ''} into ${workspace.name}`,
               },
             },
           },
@@ -206,7 +216,7 @@ export const inviteMembers = async (
         if (invitation) {
           const { transporter, mailOption } = await sendEmail(
             email,
-            "You got an invitation",
+            `You got an invitation from ${user?.firstName} ${user?.lastName || ''} to join ${workspace.name} Workspace`,
             `You are invited to join ${workspace.name} Workspace, click accept to confirm`,
             `<a href="${process.env.NEXT_PUBLIC_HOST_URL}/invite/${invitation.id}" style="background-color: #000; padding: 5px 10px; border-radius: 10px;">Accept Invite</a>`
           );

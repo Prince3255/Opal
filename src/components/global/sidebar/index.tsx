@@ -152,7 +152,7 @@ const Sidebar = ({ activeWorkspaceId }: Props) => {
             </div>
           )}
         <nav className="w-full">
-          <ul className="h-[160px] overflow-auto overflow-x-hidden fade-layer">
+          <ul className={`${data1?.data?.subscription?.plan === "FREE" ? 'h-[160px]' : 'h-[180px]'} overflow-auto overflow-x-hidden fade-layer scrollbar-thin`}>
             {data1.data?.workspace.length > 0 &&
               data1.data?.workspace.map(
                 (item) =>
