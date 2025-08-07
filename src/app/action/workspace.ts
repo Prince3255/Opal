@@ -657,7 +657,11 @@ export const moveVideoLocation = async (
   workspaceId: string,
   folderId: string
 ) => {
-  console.log('moveVideoLocation called with:', { videoId, workspaceId, folderId });
+  console.log("moveVideoLocation called with:", {
+    videoId,
+    workspaceId,
+    folderId,
+  });
   const user1 = await currentUser();
 
   try {
@@ -696,11 +700,11 @@ export const moveVideoLocation = async (
             },
           }
         );
-        
+
         if (voiceflowResponse.status === 200) {
-          const targetChunk = voiceflowResponse.data.chunks.find(
+          const targetChunk = voiceflowResponse?.data?.chunks?.find(
             (chunk: any) =>
-              chunk.metadata && chunk.metadata.workspaceId == video.workSpaceId
+              chunk.metadata && chunk.metadata.workspaceId === video.workSpaceId
           );
           if (targetChunk && targetChunk?.chunkID) {
             let transcript =
@@ -709,12 +713,10 @@ export const moveVideoLocation = async (
             const updateResponse = await axios.patch(
               `https://api.voiceflow.com/v1/knowledge-base/docs/${video.documentId}/chunk/${targetChunk.chunkID}`,
               {
-                // data: {
-                  metadata: {
-                    transcript: transcript,
-                    workspaceId: workspaceId,
-                  },
-                // },
+                metadata: {
+                  transcript: transcript,
+                  workspaceId: workspaceId,
+                },
               },
               {
                 headers: {
@@ -725,7 +727,10 @@ export const moveVideoLocation = async (
             );
 
             if (updateResponse.status === 200) {
-              console.log('done 12');
+              console.log("done 12");
+              await new Promise((resolve, reject) => {
+                setTimeout(resolve, 1000);
+              });
             }
           }
         }
