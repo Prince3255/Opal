@@ -70,10 +70,10 @@ const CreateWorkspace = (props: Props) => {
     status: number;
     data: { subscription: { plan: "PRO" | "FREE" } | null };
   };
-  if (plan.subscription?.plan === "FREE") {
+  if (plan?.subscription?.plan === "FREE") {
     return <></>;
   }
-  if (plan.subscription?.plan === "PRO") {
+  if (plan?.subscription?.plan === "PRO") {
     return (
       <Modal
         title="Create a Workspace"

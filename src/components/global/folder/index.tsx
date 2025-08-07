@@ -74,7 +74,7 @@ const Folder = ({ workspaceId }: Props) => {
                 optimistic
               />
             )}
-            {folders.map((folder) => (
+            {folders?.map((folder) => (
               <Folders
                 name={folder.name}
                 count={folder._count.videos}
