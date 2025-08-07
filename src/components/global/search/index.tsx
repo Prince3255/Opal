@@ -17,7 +17,8 @@ const Search = ({ workspaceId }: Props) => {
   const { onSearchQuery, query, isFetching, onUsers } = useSearch('get-users', 'USERS')
   const { mutate, isPending } = useMutationData(
     ['invite-member'],
-    (data: { recieverId: string, email: string }) => inviteMembers(workspaceId, data.recieverId, data.email)
+    (data: { recieverId: string, email: string }) => inviteMembers(workspaceId, data.recieverId, data.email),
+    'user-notification'
   )
 
   return <div className="flex flex-col gap-y-5">
@@ -31,7 +32,7 @@ const Search = ({ workspaceId }: Props) => {
         <p className="text-center text-sm text-[#a4a4a4]">No Users Found</p>
       ) : (
         <div>
-          {onUsers.map((user) => (
+          {onUsers?.map((user) => (
             <div
               key={user.id}
               className="flex gap-x-3 items-center border-2 w-full p-3 rounded-xl"
