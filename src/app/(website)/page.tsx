@@ -35,7 +35,7 @@ export default function Home() {
                 </Button>
               </Link>
               <Link
-                href="https://res.cloudinary.com/dzgaw9gfu/video/upload/v1752599096/video-recording-opal/8fc7ad73-89b2-4571-b2bd-983ed2e144e6-dbf4c29f.webm"
+                href="https://res.cloudinary.com/dpqfajndi/video/upload/v1754683617/Opal_Video_cloudinary_-_Made_with_Clipchamp_bh3dt7.mp4"
                 target="_blank"
               >
                 <Button

@@ -1,46 +1,9 @@
-// import React from "react";
-
-// type Props = {};
-
-// const VideoShowcase = (props: Props) => {
-//   const video = {
-//     id: 1,
-//     src: "https://res.cloudinary.com/dzgaw9gfu/video/upload/v1752599096/video-recording-opal/8fc7ad73-89b2-4571-b2bd-983ed2e144e6-dbf4c29f.webm",
-//     title: "Opal Tutorial",
-//     description: "How Opal works",
-//   };
-
-//   return (
-//     <section className="bg-gray-800 py-20">
-//       <div className="container mx-auto px-4">
-//         <h2 className="text-3xl font-bold mb-8 text-center">
-//           See Opal in Action
-//         </h2>
-//         <div defaultValue="workspace" className="w-full max-w-4xl mx-auto">
-//           <h3 className="text-xl font-semibold mt-4">{video.title}</h3>
-//           <p className="text-gray-300 mt-2">{video.description}</p>
-//           <div key={video.id} className="mt-4">
-//             <video
-//               src={video.src}
-//               className="w-full h-full object-cover"
-//               controls={true}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default VideoShowcase;
-
-
 type Props = {}
 
 const VideoShowcase = (props: Props) => {
   const video = {
     id: 1,
-    src: "https://res.cloudinary.com/dzgaw9gfu/video/upload/v1752599096/video-recording-opal/8fc7ad73-89b2-4571-b2bd-983ed2e144e6-dbf4c29f.webm",
+    src: "https://res.cloudinary.com/dpqfajndi/video/upload/v1754683617/Opal_Video_cloudinary_-_Made_with_Clipchamp_bh3dt7.mp4",
     title: "Opal Tutorial",
     description: "See how Opal transforms your video workflow",
   }
