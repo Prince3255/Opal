@@ -100,13 +100,13 @@ const ChangeVideoLocation = ({
           </Label>
         )}
       </div>
-      {errors && Object.keys(errors).length > 0 && (
+      {/* {errors && Object.keys(errors).length > 0 && (
         <div className="text-red-500 text-sm">
           {Object.entries(errors).map(([field, error]) => (
             <p key={field}>{field}: {String(error?.message || 'Invalid field')}</p>
           ))}
         </div>
-      )}
+      )} */}
       <Button 
         type="button" 
         disabled={isPending}
