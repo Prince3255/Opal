@@ -686,14 +686,23 @@ export const moveVideoLocation = async (
         documentId: true,
         workSpaceId: true,
         summery: true,
-        title: true
+        title: true,
       },
     });
 
     if (user?.subscription?.plan === "PRO" && video?.documentId) {
       try {
-        const voiceflowResponse = await axios.get(
+        let transcript = video.summery?.replace(/\[WORKSPACE:[^\]]*\]/g, "") || "";
+        transcript = transcript.trim() + ` [WORKSPACE:${workspaceId}]`;
+        const updateResponse = await axios.patch(
           `https://api.voiceflow.com/v1/knowledge-base/docs/${video.documentId}`,
+          {
+            metadata: {
+              transcript: transcript,
+              workspaceId: workspaceId,
+              title: video.title,
+            },
+          },
           {
             headers: {
               Authorization: process.env.VOICE_FLOW_API_KEY,
@@ -701,42 +710,42 @@ export const moveVideoLocation = async (
             },
           }
         );
-
-        if (voiceflowResponse.status === 200) {
-          const targetChunk = voiceflowResponse?.data?.chunks?.find(
-            (chunk: any) =>
-              chunk.metadata && chunk.metadata.workspaceId === video.workSpaceId
-          );
-          if (targetChunk && targetChunk?.chunkID) {
-            let transcript =
-              video.summery?.replace(/\[WORKSPACE:[^\]]*\]/g, "") || "";
-            transcript = transcript.trim() + ` [WORKSPACE:${workspaceId}]`;
-            const updateResponse = await axios.patch(
-              `https://api.voiceflow.com/v1/knowledge-base/docs/${video.documentId}/chunk/${targetChunk.chunkID}`,
-              {
-                content: targetChunk.content,
-                metadata: {
-                  transcript: transcript,
-                  workspaceId: workspaceId,
-                  title: video.title,
-                },
-              },
-              {
-                headers: {
-                  Authorization: process.env.VOICE_FLOW_API_KEY,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-
-            if (updateResponse.status === 200) {
-              console.log("done 12");
-              await new Promise((resolve, reject) => {
-                setTimeout(resolve, 1000);
-              });
-            }
-          }
+        if (updateResponse.status === 200) {
+          console.log("done 12");
+          await new Promise((resolve, reject) => {
+            setTimeout(resolve, 1000);
+          });
         }
+        // if (voiceflowResponse.status === 200) {
+        //   const targetChunk = voiceflowResponse?.data?.chunks?.find(
+        //     (chunk: any) =>
+        //       chunk.metadata && chunk.metadata.workspaceId === video.workSpaceId
+        //   );
+        //   if (targetChunk && targetChunk?.chunkID) {
+        //     let transcript =
+        //       video.summery?.replace(/\[WORKSPACE:[^\]]*\]/g, "") || "";
+        //     transcript = transcript.trim() + ` [WORKSPACE:${workspaceId}]`;
+        //     const updateResponse = await axios.patch(
+        //       `https://api.voiceflow.com/v1/knowledge-base/docs/${video.documentId}/chunk/${targetChunk.chunkID}`,
+        //       {
+        //         content: targetChunk.content,
+        //         metadata: {
+        //           transcript: transcript,
+        //           workspaceId: workspaceId,
+        //           title: video.title,
+        //         },
+        //       },
+        //       {
+        //         headers: {
+        //           Authorization: process.env.VOICE_FLOW_API_KEY,
+        //           "Content-Type": "application/json",
+        //         },
+        //       }
+        //     );
+
+            
+        //   }
+        // }
       } catch (voiceflowError) {
         console.error("❌ Failed to update Voiceflow KB:", voiceflowError);
       }
