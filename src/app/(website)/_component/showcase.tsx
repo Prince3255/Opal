@@ -28,7 +28,6 @@ const VideoShowcase = (props: Props) => {
                 src={video.src}
                 className="w-full h-full object-cover"
                 controls={true}
-                poster="/placeholder.svg?height=450&width=800"
               />
             </div>
             <div className="mt-6 text-center">
