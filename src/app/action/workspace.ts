@@ -692,30 +692,57 @@ export const moveVideoLocation = async (
 
     if (user?.subscription?.plan === "PRO" && video?.documentId) {
       try {
-        let transcript = video.summery?.replace(/\[WORKSPACE:[^\]]*\]/g, "") || "";
+        let transcript =
+          video.summery?.replace(/\[WORKSPACE:[^\]]*\]/g, "") || "";
         transcript = transcript.trim() + ` [WORKSPACE:${workspaceId}]`;
-        const updateResponse = await axios.patch(
+        await axios.delete(
           `https://api.voiceflow.com/v1/knowledge-base/docs/${video.documentId}`,
           {
-            metadata: {
-              transcript: transcript,
-              workspaceId: workspaceId,
-              title: video.title,
-            },
-          },
-          {
-            headers: {
-              Authorization: process.env.VOICE_FLOW_API_KEY,
-              "Content-Type": "application/json",
-            },
+            headers: { Authorization: process.env.VOICE_FLOW_API_KEY },
           }
         );
-        if (updateResponse.status === 200) {
-          console.log("done 12");
-          await new Promise((resolve, reject) => {
-            setTimeout(resolve, 1000);
+
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        const option = {
+          method: "POST",
+          url: process.env.VOICEFLOW_KNOWLEDGE_BASE_API,
+          headers: {
+            accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: process.env.VOICE_FLOW_API_KEY,
+          },
+          data: {
+            data: {
+              schema: {
+                searchableFields: ["title", "transcript"],
+                metadataFields: ["title", "transcript", "workspaceId"],
+              },
+              name: video.title,
+              items: [
+                {
+                  title: video.title,
+                  transcript: transcript,
+                  workspaceId: workspaceId,
+                },
+              ],
+            },
+          },
+        };
+
+        const updateKB = await axios.request(option);
+
+        if (updateKB.status === 200) {
+          await client.video.update({
+            where: {
+              id: videoId,
+            },
+            data: {
+              documentId: updateKB.data.data.documentID,
+            },
           });
         }
+
         // if (voiceflowResponse.status === 200) {
         //   const targetChunk = voiceflowResponse?.data?.chunks?.find(
         //     (chunk: any) =>
@@ -743,7 +770,6 @@ export const moveVideoLocation = async (
         //       }
         //     );
 
-            
         //   }
         // }
       } catch (voiceflowError) {
