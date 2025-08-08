@@ -10,7 +10,7 @@ export const LoadVoiceFlowAgent = (userId) => {
         url: "https://general-runtime.voiceflow.com",
         versionID: "production",
         assistant: {
-          stylesheet: 'https://github.com/Prince3255/css'
+          stylesheet: 'https://github.com/Prince3255/css/blob/main/index.css'
         },
         launch: {
           event: {
