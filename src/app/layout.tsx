@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme";
 import ReactQueryProvider from "@/react-query";
 import { ReduxProvider } from "@/redux/provider";
 import { Toaster } from "sonner";
+import Head from "next/head";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -22,6 +23,12 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" className="scrollbar-thin">
+        <Head>
+          <meta
+            name="google-site-verification"
+            content="2c8t4vsdjsDQQsut9YEawMUkXe-IQWRMV7QhbwI2HJw"
+          />
+        </Head>
         <body className={`${manrope.className} bg-[#171717]`}>
           <ThemeProvider
             attribute="class"
