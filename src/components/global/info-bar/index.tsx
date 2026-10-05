@@ -82,61 +82,146 @@ const InfoBar = (props: Props) => {
     (fileInputRef.current as HTMLInputElement | null)?.click();
   };
 
+  // const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   try {
+  //     setUplaoding(true);
+  //     const MAX_FILE_SIZE = 100 * 1024 * 1024;
+
+  //     const file = e.target.files?.[0];
+
+  //     if (!file) return;
+
+  //     if (file.size > MAX_FILE_SIZE) {
+  //       toast.error("Video must be smaller than 100 MB");
+  //       e.target.value = "";
+  //       setUplaoding(false);
+  //       return;
+  //     }
+
+  //     const formData = new FormData();
+
+  //     if (file) {
+  //       formData.append("file", file);
+  //       formData.append("userId", user?.id);
+  //       formData.append("clerkId", user?.clerkid);
+  //       formData.append("plan", user?.subscription?.plan);
+  //       formData.append("workspaceId", user?.workspace[0]?.id);
+  //       let res = await fetch(
+  //         "https://opal-express-08so.onrender.com/api/upload",
+  //         {
+  //           method: "POST",
+  //           body: formData,
+  //         },
+  //       );
+
+  //       if (!res.ok) {
+  //         const errorText = await res.text();
+  //         console.error("Upload failed:", res.status, errorText);
+  //         throw new Error(`Upload failed with status ${res.status}`);
+  //       }
+
+  //       let data = await res.json();
+  //       if (data.status === 200) {
+  //         toast(data?.message);
+  //         queryClient.invalidateQueries({ queryKey: ["user-videos"] });
+  //       }
+  //     }
+  //   } catch (error: any) {
+  //     console.log("Error while uploading", error);
+  //     if (error && typeof error.message === "string") {
+  //       toast(error.message || "Something went wrong");
+  //     } else {
+  //       toast("Something went wrong");
+  //     }
+  //   } finally {
+  //     setUplaoding(false);
+  //   }
+  // };
+
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const MAX_FILE_SIZE = 500 * 1024 * 1024;
+
     try {
       setUplaoding(true);
-      const MAX_FILE_SIZE = 100 * 1024 * 1024;
-
-      const file = e.target.files?.[0];
-
-      if (!file) return;
 
       if (file.size > MAX_FILE_SIZE) {
-        toast.error("Video must be smaller than 100 MB");
-        e.target.value = "";
-        setUplaoding(false);
-        return;
+        throw new Error("Video must be smaller than 500 MB");
+      }
+
+      const userId = user?.id;
+      const clerkId = user?.clerkid;
+      const plan = user?.subscription?.plan ?? "";
+      const workspaceId = user?.workspace?.[0]?.id;
+
+      if (!userId || !clerkId || !workspaceId) {
+        throw new Error("Missing user or workspace information");
       }
 
       const formData = new FormData();
 
-      if (file) {
-        formData.append("file", file);
-        formData.append("userId", user?.id);
-        formData.append("clerkId", user?.clerkid);
-        formData.append("plan", user?.subscription?.plan);
-        formData.append("workspaceId", user?.workspace[0]?.id);
-        let res = await fetch(
-          "https://opal-express-08so.onrender.com/api/upload",
-          {
-            method: "POST",
-            body: formData,
-          },
+      formData.append("file", file);
+      formData.append("userId", userId);
+      formData.append("clerkId", clerkId);
+      formData.append("plan", plan);
+      formData.append("workspaceId", workspaceId);
+
+      const response = await fetch(
+        "https://opal-express-08so.onrender.com/api/upload",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      const responseText = await response.text();
+
+      let result: {
+        status?: number;
+        message?: string;
+        videoUrl?: string;
+      };
+
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        console.error(
+          "Server returned invalid JSON:",
+          response.status,
+          responseText.slice(0, 500),
         );
 
-        if (!res.ok) {
-          const errorText = await res.text();
-          console.error("Upload failed:", res.status, errorText);
-          throw new Error(`Upload failed with status ${res.status}`);
-        }
+        throw new Error(`Upload server returned HTTP ${response.status}`);
+      }
 
-        let data = await res.json();
-        if (data.status === 200) {
-          toast(data?.message);
-          queryClient.invalidateQueries({ queryKey: ["user-videos"] });
-        }
+      if (!response.ok) {
+        throw new Error(
+          result.message || `Upload failed with status ${response.status}`,
+        );
       }
-    } catch (error: any) {
-      console.log("Error while uploading", error);
-      if (error && typeof error.message === "string") {
-        toast(error.message || "Something went wrong");
-      } else {
-        toast("Something went wrong");
-      }
+
+      toast.success(result.message || "Video uploaded successfully");
+
+      await queryClient.invalidateQueries({
+        queryKey: ["user-videos"],
+      });
+    } catch (error) {
+      console.error("Error while uploading:", error);
+
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong",
+      );
     } finally {
       setUplaoding(false);
+      e.target.value = "";
     }
   };
+
   return (
     <header className="pl-20 md:pl-[265px] fixed p-4 w-full flex items-center justify-between gap-4">
       <Popover open={isResultAvailable} onOpenChange={setIsResultAvailable}>
