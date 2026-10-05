@@ -85,7 +85,19 @@ const InfoBar = (props: Props) => {
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUplaoding(true);
+      const MAX_FILE_SIZE = 100 * 1024 * 1024;
+
       const file = e.target.files?.[0];
+
+      if (!file) return;
+
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error("Video must be smaller than 100 MB");
+        e.target.value = "";
+        setUplaoding(false);
+        return;
+      }
+
       const formData = new FormData();
 
       if (file) {
@@ -103,7 +115,6 @@ const InfoBar = (props: Props) => {
         );
 
         if (!res.ok) {
-          // console.log("Something went wrong");
           const errorText = await res.text();
           console.error("Upload failed:", res.status, errorText);
           throw new Error(`Upload failed with status ${res.status}`);
