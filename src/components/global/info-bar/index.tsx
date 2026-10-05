@@ -94,13 +94,19 @@ const InfoBar = (props: Props) => {
         formData.append("clerkId", user?.clerkid);
         formData.append("plan", user?.subscription?.plan);
         formData.append("workspaceId", user?.workspace[0]?.id);
-        let res = await fetch("https://opal-express-08so.onrender.com/api/upload", {
-          method: "POST",
-          body: formData,
-        });
+        let res = await fetch(
+          "https://opal-express-08so.onrender.com/api/upload",
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
 
         if (!res.ok) {
-          console.log("Something went wrong");
+          // console.log("Something went wrong");
+          const errorText = await res.text();
+          console.error("Upload failed:", res.status, errorText);
+          throw new Error(`Upload failed with status ${res.status}`);
         }
 
         let data = await res.json();
