@@ -8,8 +8,10 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  console.log("params: ", params);
   const body = await req.json();
   const { id } = params;
+  console.log("body: ", id, body);
   const content = body.content;
   let source = body.filename;
   if (body.filename.endsWith(".mp4")) {
