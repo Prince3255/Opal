@@ -6,23 +6,40 @@ export const dynamic = "force-dynamic";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
-  console.log("params: ", params);
-  const body = await req.json();
-  const { id } = params;
-  console.log("body: ", id, body);
-  const content = body.content;
-  let source = body.filename;
-  if (body.filename.endsWith(".mp4")) {
-    source = body.filename.split("/").pop().split(".")[0];
-  }
-  let workspaceId = body?.workspaceId || null;
   try {
+    const body = await req.json();
+    const { id } = params;
+
+    const content = body.content || {};
+    const source = body.filename;
+    const transcript = body.transcript;
+    let workspaceId = body.workspaceId || null;
+
+    console.log("Transcribe request:", {
+      userId: id,
+      source,
+      workspaceId,
+      title: content.title,
+      description: content.description,
+      transcriptLength: transcript?.length,
+    });
+
+    if (!source || !transcript || !content.title) {
+      return NextResponse.json(
+        {
+          status: 400,
+          message: "Source, title, or transcript is missing",
+        },
+        { status: 400 },
+      );
+    }
+
     if (!workspaceId) {
       const user = await client.user.findUnique({
         where: {
-          id: id,
+          id,
         },
         select: {
           workspace: {
@@ -35,33 +52,34 @@ export async function POST(
           },
         },
       });
-      console.log("user", user);
-      workspaceId = user?.workspace[0]?.id;
+
+      workspaceId = user?.workspace?.[0]?.id;
     }
+
+    if (!workspaceId) {
+      return NextResponse.json(
+        {
+          status: 400,
+          message: "Workspace was not found",
+        },
+        { status: 400 },
+      );
+    }
+
     if (body.trial) {
-      const trial = await client.user.update({
+      await client.user.update({
         where: {
-          id: id,
+          id,
         },
         data: {
           trial: true,
         },
       });
-
-      if (trial) {
-        console.log("trial ", trial);
-      }
     }
 
-    const option = {
-      method: "POST",
-      url: process.env.VOICEFLOW_KNOWLEDGE_BASE_API,
-      headers: {
-        accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: process.env.VOICE_FLOW_API_KEY,
-      },
-      data: {
+    const updateKB = await axios.post(
+      process.env.VOICEFLOW_KNOWLEDGE_BASE_API as string,
+      {
         data: {
           schema: {
             searchableFields: ["title", "transcript"],
@@ -71,48 +89,93 @@ export async function POST(
           items: [
             {
               title: content.title,
-              transcript: `${body.transcript} [WORKSPACE:${workspaceId}]`,
-              workspaceId: workspaceId,
+              transcript: `${transcript} [WORKSPACE:${workspaceId}]`,
+              workspaceId,
             },
           ],
         },
       },
-    };
-
-    const updateKB = await axios.request(option);
-
-    if (updateKB.status === 200 || updateKB.status !== 200) {
-      const transcribed = await client.video.update({
-        where: {
-          userId: id,
-          source: source,
+      {
+        headers: {
+          accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: process.env.VOICE_FLOW_API_KEY,
         },
-        data: {
-          title: content.title,
-          description: content.description,
-          summery: body.transcript,
-          documentId: updateKB.data.data.documentID,
+      },
+    );
+
+    console.log("Voiceflow response:", updateKB.data);
+
+    const documentId =
+      updateKB.data?.data?.documentID || updateKB.data?.data?.documentId;
+
+    if (!documentId) {
+      return NextResponse.json(
+        {
+          status: 502,
+          message: "Voiceflow document ID was not returned",
         },
-      });
-      console.log("updatekb data: ", updateKB.data);
-      if (transcribed) console.log("transcribed data1: ", transcribed);
-      return NextResponse.json({ status: 200 });
+        { status: 502 },
+      );
     }
-    const transcribed = await client.video.update({
+
+    const existingVideo = await client.video.findFirst({
       where: {
         userId: id,
-        source: source,
+        source,
+      },
+    });
+
+    console.log("Matching video:", existingVideo);
+
+    if (!existingVideo) {
+      return NextResponse.json(
+        {
+          status: 404,
+          message: "Video was not found",
+          lookup: {
+            userId: id,
+            source,
+          },
+        },
+        { status: 404 },
+      );
+    }
+
+    const transcribed = await client.video.update({
+      where: {
+        id: existingVideo.id,
       },
       data: {
         title: content.title,
         description: content.description,
-        summery: body.transcript,
+        summery: transcript,
+        documentId,
       },
     });
-    if (transcribed) console.log("transcribed data: ", transcribed);
-    return NextResponse.json({ status: 200 });
-  } catch (error) {
-    console.log("Error in transcribing video in opal");
-    return NextResponse.json({ status: 400 });
+
+    console.log("Updated video:", transcribed);
+
+    return NextResponse.json({
+      status: 200,
+      message: "Video updated successfully",
+      data: transcribed,
+    });
+  } catch (error: any) {
+    console.error("Error in transcribing video:", {
+      message: error.message,
+      code: error.code,
+      meta: error.meta,
+      stack: error.stack,
+    });
+
+    return NextResponse.json(
+      {
+        status: 500,
+        message: error.message || "Failed to update video",
+        code: error.code || null,
+      },
+      { status: 500 },
+    );
   }
 }
