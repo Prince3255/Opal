@@ -139,6 +139,10 @@ const InfoBar = (props: Props) => {
   // };
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (uploading) {
+      return;
+    }
+
     const file = e.target.files?.[0];
 
     if (!file) {
